@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Management System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f0f9ff;
+    }
+    .modal {
+        transition: opacity 0.3s ease-in-out;
+    }
+    .tab-content {
+        display: none;
+    }
+    .tab-content.active {
+        display: block;
+    }
+</style>
+<body class="min-h-screen">
+    <nav class="bg-sky-600 text-white p-4">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Hotel Management System</h1>
+            <div class="flex space-x-2">
+                <button onclick="showDatabaseModal()" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded">
+                    View Database
+                </button>
+                <button onclick="showModal('exitModal')" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded">
+                    Exit
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mx-auto p-4">
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden mt-4">
+            <div class="flex flex-wrap border-b">
+                <button class="tab-btn px-6 py-3 font-medium text-sm md:text-base hover:bg-sky-50 active-tab bg-sky-100 text-sky-700" data-tab="dashboard">
+                    <i class="bi bi-grid-1x2-fill mr-2"></i>Dashboard
+                </button>
+                <button class="tab-btn px-6 py-3 font-medium text-sm md:text-base hover:bg-sky-50 text-gray-600" data-tab="customer">
+                    <i class="bi bi-person-fill mr-2"></i>Customer Details
+                </button>
+                <button class="tab-btn px-6 py-3 font-medium text-sm md:text-base hover:bg-sky-50 text-gray-600" data-tab="room">
+                    <i class="bi bi-house-door-fill mr-2"></i>Room Selection
+                </button>
+                <button class="tab-btn px-6 py-3 font-medium text-sm md:text-base hover:bg-sky-50 text-gray-600" data-tab="bookings">
+                    <i class="bi bi-calendar2-check-fill mr-2"></i>Bookings
+                </button>
+            </div>
+
+            <div class="p-6">
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content active">
+                    <h2 class="text-2xl font-semibold mb-6">Welcome to Hotel Management System</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="bg-blue-100 p-4 rounded-lg shadow">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h3 class="text-lg font-medium">Total Customers</h3>
+                                    <p class="text-3xl font-bold text-blue-600" id="totalCustomers">0</p>
+                                </div>
+                                <div class="text-blue-500 text-3xl">
+                                    <i class="bi bi-people-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-green-100 p-4 rounded-lg shadow">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h3 class="text-lg font-medium">Active Bookings</h3>
+                                    <p class="text-3xl font-bold text-green-600" id="totalBookings">0</p>
+                                </div>
+                                <div class="text-green-500 text-3xl">
+                                    <i class="bi bi-calendar2-check"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-purple-100 p-4 rounded-lg shadow">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h3 class="text-lg font-medium">Available Rooms</h3>
+                                    <p class="text-3xl font-bold text-purple-600">25</p>
+                                </div>
+                                <div class="text-purple-500 text-3xl">
+                                    <i class="bi bi-door-open"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-amber-100 p-4 rounded-lg shadow">
+                            <div class="flex justify-between">
+                                <div>
+                                    <h3 class="text-lg font-medium">Total Revenue</h3>
+                                    <p class="text-3xl font-bold text-amber-600" id="totalRevenue">$0</p>
+                                </div>
+                                <div class="text-amber-500 text-3xl">
+                                    <i class="bi bi-cash-coin"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8">
+                        <h3 class="text-xl font-semibold mb-4">Recent Activities</h3>
+                        <div class="bg-white border rounded-lg overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="min-w-full divide-y divide-gray-200">
+                                    <thead class="bg-gray-50">
+                                        <tr>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activity</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="bg-white divide-y divide-gray-200" id="activitiesTable">
+                                        <tr>
+                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" colspan="3">No activities yet</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customer Details Tab -->
+                <div id="customer" class="tab-content">
+                    <h2 class="text-2xl font-semibold mb-6">Customer Details</h2>
+                    <form id="customerForm" class="space-y-4 max-w-2xl mx-auto">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-gray-700 mb-2">Full Name <span class="text-red-500">*</span></label>
+                                <input type="text" id="name" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Email <span class="text-red-500">*</span></label>
+                                <input type="email" id="email" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Phone <span class="text-red-500">*</span></label>
+                                <input type="tel" id="phone" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">ID Type</label>
+                                <select id="idType" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500">
+                                    <option value="">Select ID Type</option>
+                                    <option value="passport">Passport</option>
+                                    <option value="driving_license">Driving License</option>
+                                    <option value="national_id">National ID</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">ID Number</label>
+                                <input type="text" id="idNumber" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500">
+                            </div>
+                            <div>
+                                <label class="block text-gray-700 mb-2">Address</label>
+                                <input type="text" id="address" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500">
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300 mt-4">
+                            <i class="bi bi-save mr-2"></i>Save Customer Details
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Room Selection Tab -->
+                <div id="room" class="tab-content">
+                    <h2 class="text-2xl font-semibold mb-6">Room Selection</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <form id="roomForm" class="space-y-4">
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Select Customer <span class="text-red-500">*</span></label>
+                                    <select id="customerSelect" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500" required>
+                                        <option value="">Select Customer</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Room Type <span class="text-red-500">*</span></label>
+                                    <select id="roomType" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500" required>
+                                        <option value="">Select Room Type</option>
+                                        <option value="standard">Standard Room ($100/night)</option>
+                                        <option value="deluxe">Deluxe Room ($200/night)</option>
+                                        <option value="suite">Suite ($300/night)</option>
+                                        <option value="executive">Executive Suite ($400/night)</option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Check-in Date <span class="text-red-500">*</span></label>
+                                        <input type="date" id="checkIn" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500" required>
+                                    </div>
+                                    <div>
+                                        <label class="block text-gray-700 mb-2">Number of Nights <span class="text-red-500">*</span></label>
+                                        <input type="number" id="nights" min="1" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500" required>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Number of Guests</label>
+                                    <input type="number" id="guests" min="1" max="4" value="1" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 mb-2">Special Requests</label>
+                                    <textarea id="requests" class="w-full p-3 border rounded-lg focus:ring focus:ring-sky-100 focus:border-sky-500" rows="2"></textarea>
+                                </div>
+                                <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-medium py-3 px-4 rounded-lg transition duration-300">
+                                    <i class="bi bi-check-circle mr-2"></i>Book Room
+                                </button>
+                            </form>
+                        </div>
+                        <div>
+                            <div class="bg-gray-50 p-6 rounded-lg border h-full">
+                                <h3 class="text-lg font-semibold mb-4">Booking Summary</h3>
+                                <div id="customerSummary" class="mb-4 pb-4 border-b">
+                                    <p class="text-gray-500 italic">Select a customer to continue</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Room:</span>
+                                        <span id="roomSummary" class="font-medium">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Check-in:</span>
+                                        <span id="checkInSummary" class="font-medium">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Nights:</span>
+                                        <span id="nightsSummary" class="font-medium">-</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span class="text-gray-600">Rate:</span>
+                                        <span id="rateSummary" class="font-medium">-</span>
+                                    </div>
+                                    <div class="border-t pt-4 mt-4">
+                                        <div class="flex justify-between items-center">
+                                            <span class="font-semibold text-lg">Total Cost:</span>
+                                            <span id="totalCost" class="text-2xl font-bold text-sky-600">$0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Bookings Tab -->
+                <div id="bookings" class="tab-content">
+                    <h2 class="text-2xl font-semibold mb-6">Current Bookings</h2>
+                    <div class="bg-white rounded-lg border overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-in</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nights</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="bookingsTable">
+                                    <tr>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500" colspan="7">No bookings found</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Exit Modal -->
+    <div id="exitModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-sm w-full mx-4">
+            <h2 class="text-xl font-bold mb-4">Confirm Exit</h2>
+            <p class="mb-4">Are you sure you want to exit? All unsaved changes will be lost.</p>
+            <div class="flex justify-end space-x-4">
+                <button onclick="hideModal('exitModal')" class="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded">
+                    Cancel
+                </button>
+                <button onclick="exitSystem()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                    Exit
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg max-w-sm w-full mx-4">
+            <div class="text-center">
+                <i class="bi bi-check-circle-fill text-green-500 text-5xl"></i>
+                <h2 class="text-xl font-bold my-4">Success!</h2>
+                <p class="mb-4" id="successMessage"></p>
+                <button onclick="hideModal('successModal')" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded w-full">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Database Modal -->
+    <div id="databaseModal" class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg w-full max-w-4xl mx-4 max-h-[90vh] overflow-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Database Records</h2>
+                <button onclick="hideModal('databaseModal')" class="text-gray-500 hover:text-gray-700">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            
+            <div class="mb-4">
+                <div class="flex border-b">
+                    <button class="db-tab-btn px-4 py-2 font-medium border-b-2 border-sky-600 text-sky-600" data-tab="customersDB">Customers</button>
+                    <button class="db-tab-btn px-4 py-2 font-medium border-b-2 border-transparent" data-tab="bookingsDB">Bookings</button>
+                </div>
+            </div>
+            
+            <div id="customersDB" class="db-tab-content block">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Number</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="customersDBTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="bookingsDB" class="db-tab-content hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room Type</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Check-in</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nights</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200" id="bookingsDBTable">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <p class="text-gray-500 text-sm">Note: This is a simulated database for demonstration purposes.</p>
+                <p class="text-gray-500 text-sm">All data is stored locally in browser memory.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Database simulation
+        const database = {
+            customers: [],
+            bookings: [],
+            activities: []
+        };
+
+        // Show modal function
+        function showModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        // Hide modal function
+        function hideModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Exit system function
+        function exitSystem() {
+            window.location.href = "about:blank";
+        }
+
+        // Calculate room cost
+        const roomPrices = {
+            'standard': 100,
+            'deluxe': 200,
+            'suite': 300,
+            'executive': 400
+        };
+
+        function calculateTotal() {
+            const roomType = document.getElementById('roomType').value;
+            const nights = document.getElementById('nights').value;
+            if (roomType && nights) {
+                const total = roomPrices[roomType] * parseInt(nights);
+                document.getElementById('totalCost').textContent = `$${total}`;
+                
+                // Update booking summary
+                document.getElementById('roomSummary').textContent = document.getElementById('roomType').options[document.getElementById('roomType').selectedIndex].text;
+                document.getElementById('checkInSummary').textContent = document.getElementById('checkIn').value;
+                document.getElementById('nightsSummary').textContent = nights + (parseInt(nights) === 1 ? ' night' : ' nights');
+                document.getElementById('rateSummary').textContent = `$${roomPrices[roomType]}/night`;
+            }
+        }
+
+        // Tab navigation
+        document.querySelectorAll('.tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Hide all tab contents
+                document.querySelectorAll('.tab-content').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                
+                // Show selected tab content
+                document.getElementById(tabId).classList.add('active');
+                
+                // Update active tab styling
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active-tab', 'bg-sky-100', 'text-sky-700');
+                    btn.classList.add('text-gray-600');
+                });
+                
+                this.classList.add('active-tab', 'bg-sky-100', 'text-sky-700');
+                this.classList.remove('text-gray-600');
+            });
+        });
+
+        // Database tab navigation
+        document.querySelectorAll('.db-tab-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // Hide all tab contents
+                document.querySelectorAll('.db-tab-content').forEach(tab => {
+                    tab.classList.add('hidden');
+                });
+                
+                // Show selected tab content
+                document.getElementById(tabId).classList.remove('hidden');
+                
+                // Update active tab styling
+                document.querySelectorAll('.db-tab-btn').forEach(btn => {
+                    btn.classList.remove('border-sky-600', 'text-sky-600');
+                    btn.classList.add('border-transparent');
+                });
+                
+                this.classList.add('border-sky-600', 'text-sky-600');
+                this.classList.remove('border-transparent');
+            });
+        });
+
+        // Show database modal
+        function showDatabaseModal() {
+            // Populate database tables before showing modal
+            updateDatabaseTables();
+            showModal('databaseModal');
+        }
+
+        function updateDatabaseTables() {
+            // Update customers table
+            const customersTable = document.getElementById('customersDBTable');
+            customersTable.innerHTML = '';
+            
+            if (database.customers.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No customer records found</td>`;
+                customersTable.appendChild(row);
+            } else {
+                database.customers.forEach(customer => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${customer.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${customer.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${customer.email}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${customer.phone}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${customer.idType || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${customer.idNumber || '-'}</td>
+                    `;
+                    customersTable.appendChild(row);
+                });
+            }
+            
+            // Update bookings table
+            const bookingsTable = document.getElementById('bookingsDBTable');
+            bookingsTable.innerHTML = '';
+            
+            if (database.bookings.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">No booking records found</td>`;
+                bookingsTable.appendChild(row);
+            } else {
+                database.bookings.forEach(booking => {
+                    const customer = database.customers.find(c => c.id === booking.customerId);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${booking.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${customer ? customer.name : '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${booking.roomType}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${booking.checkIn}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${booking.nights}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">$${booking.total}</td>
+                    `;
+                    bookingsTable.appendChild(row);
+                });
+            }
+        }
+
+        // Update customer select dropdown
+        function updateCustomerSelect() {
+            const select = document.getElementById('customerSelect');
+            select.innerHTML = '<option value="">Select Customer</option>';
+            
+            database.customers.forEach(customer => {
+                const option = document.createElement('option');
+                option.value = customer.id;
+                option.textContent = customer.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Update bookings table
+        function updateBookingsTable() {
+            const table = document.getElementById('bookingsTable');
+            table.innerHTML = '';
+            
+            if (database.bookings.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">No bookings found</td>`;
+                table.appendChild(row);
+            } else {
+                database.bookings.forEach(booking => {
+                    const customer = database.customers.find(c => c.id === booking.customerId);
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${booking.id}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${customer ? customer.name : '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${booking.roomType}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${booking.checkIn}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${booking.nights}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">$${booking.total}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <button onclick="deleteBooking(${booking.id})" class="text-red-500 hover:text-red-700">
+                                <i class="bi bi-trash"></i> Cancel
+                            </button>
+                        </td>
+                    `;
+                    table.appendChild(row);
+                });
+            }
+        }
+
+        // Update activities table
+        function updateActivitiesTable() {
+            const table = document.getElementById('activitiesTable');
+            table.innerHTML = '';
+            
+            if (database.activities.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = `<td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">No activities yet</td>`;
+                table.appendChild(row);
+            } else {
+                database.activities.slice(0, 5).forEach(activity => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${activity.date}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${activity.customer}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${activity.action}</td>
+                    `;
+                    table.appendChild(row);
+                });
+            }
+        }
+
+        // Update dashboard stats
+        function updateDashboardStats() {
+            document.getElementById('totalCustomers').textContent = database.customers.length;
+            document.getElementById('totalBookings').textContent = database.bookings.length;
+            
+            // Calculate total revenue
+            const totalRevenue = database.bookings.reduce((sum, booking) => sum + booking.total, 0);
+            document.getElementById('totalRevenue').textContent = '$' + totalRevenue;
+        }
+
+        // Delete booking
+        function deleteBooking(id) {
+            const booking = database.bookings.find(b => b.id === id);
+            if (booking) {
+                const customer = database.customers.find(c => c.id === booking.customerId);
+                if (customer) {
+                    // Add activity
+                    database.activities.unshift({
+                        date: new Date().toLocaleString(),
+                        customer: customer.name,
+                        action: `Booking cancelled for ${booking.roomType}`
+                    });
+                }
+                
+                // Remove booking
+                database.bookings = database.bookings.filter(b => b.id !== id);
+                
+                // Update UI
+                updateBookingsTable();
+                updateActivitiesTable();
+                updateDashboardStats();
+
+                // Show success message
+                document.getElementById('successMessage').textContent = 'Booking has been cancelled successfully!';
+                showModal('successModal');
+            }
+        }
+
+        // Handle customer selection in room booking form
+        document.getElementById('customerSelect').addEventListener('change', function() {
+            const customerId = this.value;
+            
+            if (customerId) {
+                const customer = database.customers.find(c => c.id === parseInt(customerId));
+                if (customer) {
+                    document.getElementById('customerSummary').innerHTML = `
+                        <p class="font-medium">${customer.name}</p>
+                        <p class="text-sm text-gray-500">${customer.email}</p>
+                        <p class="text-sm text-gray-500">${customer.phone}</p>
+                    `;
+                }
+            } else {
+                document.getElementById('customerSummary').innerHTML = `
+                    <p class="text-gray-500 italic">Select a customer to continue</p>
+                `;
+            }
+        });
+
+        // Event listeners for room form
+        document.getElementById('roomType').addEventListener('change', calculateTotal);
+        document.getElementById('nights').addEventListener('input', calculateTotal);
+        document.getElementById('checkIn').addEventListener('change', calculateTotal);
+
+        // Handle customer form submission
+        document.getElementById('customerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            const idType = document.getElementById('idType').value;
+            const idNumber = document.getElementById('idNumber').value;
+            const address = document.getElementById('address').value;
+            
+            // Generate ID
+            const id = database.customers.length > 0 ? Math.max(...database.customers.map(c => c.id)) + 1 : 1;
+            
+            // Add to database
+            database.customers.push({
+                id,
+                name,
+                email,
+                phone,
+                idType,
+                idNumber,
+                address
+            });
+            
+            // Add activity
+            database.activities.unshift({
+                date: new Date().toLocaleString(),
+                customer: name,
+                action: 'Customer registered'
+            });
+            
+            // Update UI
+            updateCustomerSelect();
+            updateActivitiesTable();
+            updateDashboardStats();
+            
+            // Show success message
+            document.getElementById('successMessage').textContent = `Customer ${name} has been registered successfully!`;
+            showModal('successModal');
+            this.reset();
+        });
+
+        // Handle room form submission
+        document.getElementById('roomForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const customerId = parseInt(document.getElementById('customerSelect').value);
+            const roomType = document.getElementById('roomType').value;
+            const checkIn = document.getElementById('checkIn').value;
+            const nights = parseInt(document.getElementById('nights').value);
+            const guests = document.getElementById('guests').value;
+            const requests = document.getElementById('requests').value;
+            
+            // Validate
+            if (!customerId) {
+                alert('Please select a customer');
+                return;
+            }
+            
+            // Calculate total
+            const total = roomPrices[roomType] * nights;
+            
+            // Get room type text
+            const roomTypeText = document.getElementById('roomType').options[document.getElementById('roomType').selectedIndex].text;
+            
+            // Generate ID
+            const id = database.bookings.length > 0 ? Math.max(...database.bookings.map(b => b.id)) + 1 : 1;
+            
+            // Add to database
+            database.bookings.push({
+                id,
+                customerId,
+                roomType: roomTypeText,
+                checkIn,
+                nights,
+                guests,
+                requests,
+                total
+            });
+            
+            // Find customer
+            const customer = database.customers.find(c => c.id === customerId);
+            
+            // Add activity
+            database.activities.unshift({
+                date: new Date().toLocaleString(),
+                customer: customer ? customer.name : 'Unknown',
+                action: `Booked ${roomTypeText} for ${nights} nights`
+            });
+            
+            // Update UI
+            updateBookingsTable();
+            updateActivitiesTable();
+            updateDashboardStats();
+            
+            // Show success message
+            document.getElementById('successMessage').textContent = `Room booking confirmed! ${roomTypeText} booked for $${total}`;
+            showModal('successModal');
+            
+            // Reset form and summary
+            this.reset();
+            document.getElementById('totalCost').textContent = '$0';
+            document.getElementById('roomSummary').textContent = '-';
+            document.getElementById('checkInSummary').textContent = '-';
+            document.getElementById('nightsSummary').textContent = '-';
+            document.getElementById('rateSummary').textContent = '-';
+            document.getElementById('customerSummary').innerHTML = `
+                <p class="text-gray-500 italic">Select a customer to continue</p>
+            `;
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date as min date for check-in
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('checkIn').min = today;
+            
+            // Add some sample data
+            if (database.customers.length === 0) {
+                database.customers.push({
+                    id: 1, 
+                    name: 'John Smith',
+                    email: 'john@example.com',
+                    phone: '555-123-4567',
+                    idType: 'passport',
+                    idNumber: 'A123456',
+                    address: '123 Main St'
+                });
+                
+                database.customers.push({
+                    id: 2, 
+                    name: 'Sarah Johnson',
+                    email: 'sarah@example.com',
+                    phone: '555-987-6543',
+                    idType: 'driving_license',
+                    idNumber: 'DL987654',
+                    address: '456 Oak Ave'
+                });
+                
+                database.bookings.push({
+                    id: 1,
+                    customerId: 1,
+                    roomType: 'Deluxe Room ($200/night)',
+                    checkIn: '2023-06-15',
+                    nights: 3,
+                    guests: 2,
+                    requests: 'High floor please',
+                    total: 600
+                });
+                
+                database.activities.unshift({
+                    date: '6/10/2023, 9:30:45 AM',
+                    customer: 'John Smith',
+                    action: 'Customer registered'
+                });
+                
+                database.activities.unshift({
+                    date: '6/10/2023, 9:32:15 AM',
+                    customer: 'Sarah Johnson',
+                    action: 'Customer registered'
+                });
+                
+                database.activities.unshift({
+                    date: '6/10/2023, 9:35:22 AM',
+                    customer: 'John Smith',
+                    action: 'Booked Deluxe Room ($200/night) for 3 nights'
+                });
+            }
+            
+            // Update UI
+            updateCustomerSelect();
+            updateBookingsTable();
+            updateActivitiesTable();
+            updateDashboardStats();
+        });
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
